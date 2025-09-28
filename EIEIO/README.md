@@ -1,5 +1,4 @@
 # User Guide 
 1. Create a folder named "input-mzml" in the downloaded package before running the _identification.py_ script. This tool supports the mzML file format of the LC-MS raw data and only need to run the _identification.py_ to get the final output file after downloading this folder.For the traceability of the identification results, the temporary results obtained in each step were saved. 
 2. It is recommended to convert the original data into mzml format in the MSConvert software by following the steps shown in the picture below.
-![MSConvert-mzml](https://github.com/user-attachments/assets/e6cb12b4-5e2e-4936-bc46-65889fbe7a98)
-
+![msconvert](https://github.com/user-attachments/assets/da3dfe84-0ca6-444d-b69f-3d2017f596be)
