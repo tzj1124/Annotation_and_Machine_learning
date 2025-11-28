@@ -4,7 +4,7 @@ from openpyxl import Workbook
 import pandas as pd
 from openpyxl.utils.dataframe import dataframe_to_rows
 import numpy as np
-import shutil  # 添加shutil模块用于删除文件夹
+import shutil  
 def main(input_folder, split_folder):
     os.makedirs(split_folder, exist_ok=True)
     for file in os.listdir(input_folder):
@@ -37,7 +37,7 @@ def extract_and_process(experiment, workbook):
                 j += 1
 def split_workbook(workbook, output_prefix):
     output_dir = os.path.dirname(output_prefix)
-    if output_dir:  # 确保路径非空
+    if output_dir:  
         os.makedirs(output_dir, exist_ok=True)
     sheet_names = workbook.sheetnames
     batch_size = 2000
@@ -1284,7 +1284,7 @@ def process_excel(input_folder, index_file, output_folder):
                                     processed_data = pd.concat([processed_data, process_func(input_data.copy(), index_data[f'DU-{i}'])], ignore_index=True)
                         processed_data.to_excel(writer, index=False, sheet_name=sheet_name)
 
-# 全局存储已经警告过的消息
+
 _warned_messages = set()
 
 def warn_once(message: str):
@@ -1293,7 +1293,7 @@ def warn_once(message: str):
         print(f"Warning: {message}")
         _warned_messages.add(message)
 
-# 判断注释层级相关
+
 nl_columns = [
     "NL-1 Matched", "NL-2 Matched", "NL-4 Matched",
     "NL-6 Matched", "NL-8 Matched", "NL-10 Matched", "NL-12 Matched"
@@ -1312,7 +1312,7 @@ required_columns = [
 def process_sheet(df: pd.DataFrame) -> pd.DataFrame:
     if 'Subclass' not in df.columns:
         warn_once("'Subclass' column not found!")
-        return None  # 直接跳过这个 sheet
+        return None  
 
     subclass_targets = ['LPC', 'LPC-O', 'LPC-P', 'LPE', 'LPE-O', 'LPE-P']
     first = df['Subclass'].iloc[0]
@@ -1337,25 +1337,25 @@ def process_excel_step2(df: pd.DataFrame) -> pd.DataFrame:
         warn_once("'MS2mz' or 'MS2i' column not found!")
         return None  # 跳过
 
-    # —— 把这两列转为 object，才能存放字符串 ——
+    
     df['MS2mz'] = df['MS2mz'].astype(object)
     df['MS2i']  = df['MS2i'].astype(object)
 
-    # 删除多余列
+    
     columns_to_drop = ['sn_2_chain_b', 'sn_1_chain_d', 'sn_3_chain_f']
     df.drop(columns=[c for c in columns_to_drop if c in df.columns], inplace=True)
 
-    # 拼接并写入第一行，其他行清空
+    
     df.at[0, 'MS2mz'] = ','.join(map(str, df['MS2mz'].dropna().tolist()))
     df.at[0, 'MS2i']  = ','.join(map(str, df['MS2i'].dropna().tolist()))
     df.loc[1:, ['MS2mz', 'MS2i']] = ''
 
-    # 构造 C=C diagnostic ions
+    # C=C diagnostic ions
     def make_cc(row):
         return ";".join(str(row[c]) for c in nl_columns if c in row and pd.notna(row[c]))
     df['C=C diagnostic ions'] = df.apply(make_cc, axis=1)
 
-    # 构造 sn-diagnostic ions
+    # sn-diagnostic ions
     def make_sn(row):
         parts = []
         for cols in sn_columns:
@@ -1365,16 +1365,16 @@ def process_excel_step2(df: pd.DataFrame) -> pd.DataFrame:
         return ";".join(parts)
     df['sn-diagnostic ions'] = df.apply(make_sn, axis=1)
 
-    # 确保所有必需列存在
+    
     for col in required_columns:
         if col not in df.columns:
             warn_once(f"Missing column '{col}', filling with None.")
             df[col] = None
 
-    # 只保留 required_columns 顺序
+    
     df = df[required_columns]
 
-    # 清空多余 ADDUCT_TYPE
+    
     if 'ADDUCT_TYPE' in df.columns:
         df.loc[1:, 'ADDUCT_TYPE'] = ''
 
@@ -1481,7 +1481,7 @@ if __name__ == "__main__":
         "final_results"
     ]
 
-    # 创建所有输出文件夹
+    
     for folder in output_folders:
         os.makedirs(folder, exist_ok=True)
 
@@ -1513,5 +1513,6 @@ if __name__ == "__main__":
         print("Processing completed.")
 
     finally:
-        # 无论处理是否成功，都尝试清理中间文件夹
+        
+
         cleanup_intermediate_folders()
